@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { transactionService, budgetService, categoryService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { Plus, TrendingUp, TrendingDown, Wallet, LogOut, ArrowUpRight, ArrowDownRight, MoreVertical, Receipt, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TransactionModal from '../components/TransactionModal';
@@ -8,7 +9,12 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import toast from 'react-hot-toast';
 
 export default function Dashboard() {
-  const [data, setData] = useState({ transactions: [], budgets: [], summary: { income: 0, expense: 0, balance: 0 } });
+  const [data, setData] = useState({
+    recentTransactions: [],  // 10 giao dịch gần nhất (để hiển thị)
+    chartData: [],           // Dữ liệu tổng hợp theo ngày (để vẽ biểu đồ)
+    budgets: [],
+    summary: { income: 0, expense: 0, balance: 0 }
+  });
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,29 +37,54 @@ export default function Dashboard() {
   const handleAddTransaction = async (txData) => {
     try {
       await transactionService.create(txData);
-      toast.success('Movement recorded successfully 💸');
+      toast.success('Ghi nhận giao dịch thành công 💸');
       setIsTxModalOpen(false);
-      fetchData(); // Refresh data
+      fetchData();
     } catch (err) {
-      const message = err.response?.data?.message || err.message || 'Check database connection';
-      toast.error(`Error: ${message}`);
+      const message = err.response?.data?.message || err.message || 'Kiểm tra kết nối cơ sở dữ liệu';
+      toast.error(`Lỗi: ${message}`);
       console.error(err);
     }
   };
 
   const fetchData = async () => {
     try {
-      const [{ data: transactionsResponse }, { data: budgetsResponse }] = await Promise.all([
-        transactionService.getAll(0, 5),
+      // Lấy toàn bộ giao dịch (size=1000) để tính chính xác tổng thu/chi/số dư
+      // và lấy ngân sách tháng hiện tại
+      const [{ data: allTxResponse }, { data: budgetsResponse }] = await Promise.all([
+        transactionService.getAll(0, 1000),
         budgetService.getAll(new Date().getMonth() + 1, new Date().getFullYear())
       ]);
 
-      const transactions = transactionsResponse?.content || [];
-      const income = transactions.filter(t => t.type === 'INCOME').reduce((acc, t) => acc + t.amount, 0);
-      const expense = transactions.filter(t => t.type === 'EXPENSE').reduce((acc, t) => acc + t.amount, 0);
+      const allTransactions = allTxResponse?.content || [];
+
+      // Tính tổng thu nhập và chi phí từ TOÀN BỘ giao dịch
+      const income = allTransactions
+        .filter(t => t.type === 'INCOME')
+        .reduce((acc, t) => acc + t.amount, 0);
+      const expense = allTransactions
+        .filter(t => t.type === 'EXPENSE')
+        .reduce((acc, t) => acc + t.amount, 0);
+
+      // Tổng hợp chi phí theo ngày cho biểu đồ (30 ngày gần nhất)
+      const expenseByDate = allTransactions
+        .filter(t => t.type === 'EXPENSE')
+        .reduce((acc, t) => {
+          const date = t.transactionDate;
+          acc[date] = (acc[date] || 0) + t.amount;
+          return acc;
+        }, {});
+      const chartData = Object.entries(expenseByDate)
+        .map(([date, amount]) => ({ transactionDate: date, amount }))
+        .sort((a, b) => a.transactionDate.localeCompare(b.transactionDate))
+        .slice(-30); // Chỉ hiển thị 30 ngày gần nhất trên biểu đồ
+
+      // Chỉ lấy 10 giao dịch gần nhất để hiển thị ở mục "Hoạt động gần đây"
+      const recentTransactions = allTransactions.slice(0, 10);
 
       setData({
-        transactions,
+        recentTransactions,
+        chartData,
         budgets: budgetsResponse,
         summary: { income, expense, balance: income - expense }
       });
@@ -86,12 +117,12 @@ export default function Dashboard() {
         <motion.div variants={itemVariants}>
           <div className="flex items-center gap-2 text-muted mb-2 font-medium">
             <Calendar className="w-4 h-4" />
-            <span>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            <span>{new Date().toLocaleDateString('vi-VN', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
           </div>
           <h1 className="text-4xl font-black text-foreground tracking-tight">
-            Hey, <span className="text-gradient">{user?.name}</span> 👋
+            Chào bạn, <span className="text-gradient">{user?.name}</span> 👋
           </h1>
-          <p className="text-muted text-lg mt-1 font-medium">Welcome back to your financial control center.</p>
+          <p className="text-muted text-lg mt-1 font-medium">Chào mừng trở lại trung tâm kiểm soát tài chính của bạn.</p>
         </motion.div>
         
         <motion.div variants={itemVariants} className="flex gap-4">
@@ -100,7 +131,7 @@ export default function Dashboard() {
             className="btn-primary flex items-center gap-2 group"
           >
             <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" /> 
-            New Transaction
+            Giao dịch mới
           </button>
         </motion.div>
       </div>
@@ -116,21 +147,21 @@ export default function Dashboard() {
       {/* Summary Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <SummaryCard 
-          title="Total Balance" 
+          title="Tổng số dư" 
           amount={data.summary.balance} 
           icon={<Wallet className="w-8 h-8" />}
           gradient="from-primary to-accent"
           variants={itemVariants}
         />
         <SummaryCard 
-          title="Income" 
+          title="Thu nhập" 
           amount={data.summary.income} 
           icon={<TrendingUp className="w-8 h-8" />}
           gradient="from-emerald-500 to-teal-400"
           variants={itemVariants}
         />
         <SummaryCard 
-          title="Expenses" 
+          title="Chi phí" 
           amount={data.summary.expense} 
           icon={<TrendingDown className="w-8 h-8" />}
           gradient="from-rose-500 to-orange-400"
@@ -143,18 +174,14 @@ export default function Dashboard() {
         <motion.div variants={itemVariants} className="lg:col-span-2 glass-card p-8 relative overflow-hidden">
           <div className="flex justify-between items-center mb-10">
             <div>
-              <h3 className="text-xl font-bold text-foreground">Spending Analysis</h3>
-              <p className="text-muted text-sm font-medium">Your activity overview</p>
-            </div>
-            <div className="flex gap-1 bg-secondary p-1 rounded-xl border border-border">
-               <button className="px-5 py-1.5 rounded-lg text-xs font-bold bg-background text-primary shadow-sm">WEEK</button>
-               <button className="px-5 py-1.5 rounded-lg text-xs font-bold text-muted hover:text-foreground transition-colors">MONTH</button>
+              <h3 className="text-xl font-bold text-foreground">Phân tích chi tiêu</h3>
+              <p className="text-muted text-sm font-medium">Tổng quan hoạt động của bạn</p>
             </div>
           </div>
           
           <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.transactions.slice().filter(t => t.type === 'EXPENSE').reverse()}>
+              <AreaChart data={data.chartData}>
                 <defs>
                   <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
@@ -175,7 +202,7 @@ export default function Dashboard() {
                   fontSize={11} 
                   tickLine={false} 
                   axisLine={false} 
-                  tickFormatter={(val) => `₹${val}`}
+                  tickFormatter={(val) => `${val.toLocaleString('vi-VN')} đ`}
                 />
                 <Tooltip 
                   contentStyle={{ 
@@ -203,10 +230,10 @@ export default function Dashboard() {
         {/* Budgets Sidebar */}
         <motion.div variants={itemVariants} className="glass-card p-8 h-fit">
           <div className="flex justify-between items-center mb-8 border-b border-border pb-4">
-            <h3 className="text-xl font-bold text-foreground">Active Budgets</h3>
-            <button className="bg-primary/10 p-2 rounded-lg hover:bg-primary/20 transition-colors">
+            <h3 className="text-xl font-bold text-foreground">Ngân sách đang hoạt động</h3>
+            <Link to="/budgets" className="bg-primary/10 p-2 rounded-lg hover:bg-primary/20 transition-colors">
               <Plus className="w-5 h-5 text-primary" />
-            </button>
+            </Link>
           </div>
 
           <div className="space-y-6">
@@ -219,13 +246,13 @@ export default function Dashboard() {
                   <div className="flex justify-between items-end mb-2">
                     <div>
                       <p className="text-muted text-[10px] uppercase tracking-widest font-bold mb-1 group-hover/budget:text-primary transition-colors">{b.categoryName}</p>
-                      <h4 className="text-foreground font-extrabold text-lg">₹{b.currentSpending.toLocaleString()}</h4>
+                      <h4 className="text-foreground font-extrabold text-lg">{b.currentSpending.toLocaleString('vi-VN')} VNĐ</h4>
                     </div>
                     <div className="text-right">
                       <p className={`text-xs font-black ${isHigh ? 'text-rose-500' : 'text-primary'}`}>
                         {percentage.toFixed(0)}%
                       </p>
-                      <p className="text-[10px] text-muted font-medium">of ₹{b.limitAmount.toLocaleString()}</p>
+                      <p className="text-[10px] text-muted font-medium">của {b.limitAmount.toLocaleString('vi-VN')} VNĐ</p>
                     </div>
                   </div>
                   
@@ -246,29 +273,26 @@ export default function Dashboard() {
                 <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3">
                   <Receipt className="w-6 h-6 text-muted" />
                 </div>
-                <p className="text-muted text-sm font-medium">No budgets set yet.</p>
+                <p className="text-muted text-sm font-medium">Chưa có ngân sách nào được thiết lập.</p>
               </div>
             )}
           </div>
           
-          <button className="w-full mt-10 py-3.5 rounded-xl bg-primary/5 border border-primary/20 text-primary font-bold hover:bg-primary/10 transition-all text-sm uppercase tracking-widest active:scale-[0.98]">
-            Plan New Budget
-          </button>
+          <Link to="/budgets" className="block text-center w-full mt-10 py-3.5 rounded-xl bg-primary/5 border border-primary/20 text-primary font-bold hover:bg-primary/10 transition-all text-sm uppercase tracking-widest active:scale-[0.98]">
+            Lập Ngân sách mới
+          </Link>
         </motion.div>
       </div>
 
       {/* Recent Transactions List */}
       <motion.div variants={itemVariants} className="glass-card p-8">
         <div className="flex justify-between items-center mb-8 border-b border-border pb-4">
-          <h3 className="text-xl font-bold text-foreground">Recent Activity</h3>
-          <button className="text-xs font-black text-primary hover:text-accent transition-colors uppercase tracking-widest">
-            View Statement
-          </button>
+          <h3 className="text-xl font-bold text-foreground">Hoạt động gần đây</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <AnimatePresence mode="popLayout">
-            {data.transactions.length > 0 ? data.transactions.map((t, index) => (
+            {data.recentTransactions.length > 0 ? data.recentTransactions.map((t, index) => (
               <motion.div 
                 key={t.id}
                 initial={{ opacity: 0, x: -10 }}
@@ -291,16 +315,13 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center gap-5">
                   <p className={`text-lg font-black ${t.type === 'INCOME' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    {t.type === 'INCOME' ? '+' : '-'} ₹{t.amount.toLocaleString()}
+                    {t.type === 'INCOME' ? '+' : '-'}{t.amount.toLocaleString('vi-VN')} VNĐ
                   </p>
-                  <button className="text-muted hover:text-foreground transition-colors p-1">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
                 </div>
               </motion.div>
             )) : (
               <div className="col-span-full py-10 text-center">
-                <p className="text-muted font-medium">No recent activity.</p>
+                <p className="text-muted font-medium">Không có hoạt động gần đây.</p>
               </div>
             )}
           </AnimatePresence>
@@ -329,7 +350,7 @@ function SummaryCard({ title, amount, icon, gradient, variants }) {
         
         <p className="text-muted text-[10px] font-black uppercase tracking-[0.2em] mb-3">{title}</p>
         <h2 className="text-4xl font-black text-foreground tracking-tight">
-          ₹{amount.toLocaleString()}
+          {amount.toLocaleString('vi-VN')} VNĐ
         </h2>
         
         <div className="mt-6 flex items-center gap-2 text-muted text-[10px] font-bold uppercase tracking-wider">
@@ -337,7 +358,7 @@ function SummaryCard({ title, amount, icon, gradient, variants }) {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
           </span>
-          Live View
+          Trực tiếp
         </div>
       </div>
     </motion.div>

@@ -14,10 +14,10 @@ export default function Register() {
     setLoading(true);
     try {
       await authService.register(formData);
-      alert('Account created successfully!');
+      alert('Tạo tài khoản thành công!');
       navigate('/login');
     } catch (err) {
-      alert('Registration failed: ' + (err.response?.data?.message || 'Error occurred'));
+      alert('Đăng ký thất bại: ' + (err.response?.data?.message || 'Đã xảy ra lỗi'));
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function Register() {
             <div className="p-2 rounded-lg bg-primary-foreground/10 group-hover:bg-primary-foreground/20 transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </div>
-            <span className="font-semibold tracking-wide">BACK TO HOME</span>
+            <span className="font-semibold tracking-wide">VỀ TRANG CHỦ</span>
           </Link>
           
           <div className="relative z-10 w-full">
@@ -51,11 +51,11 @@ export default function Register() {
               transition={{ delay: 0.3, duration: 0.8 }}
             >
               <h1 className="text-6xl font-black mb-6 text-primary-foreground leading-tight tracking-tighter">
-                Start Your<br/>
-                <span className="text-white/80">Journey.</span>
+                Bắt Đầu<br/>
+                <span className="text-white/80">Hành Trình.</span>
               </h1>
               <p className="text-lg text-primary-foreground/70 mb-10 max-w-xs font-medium leading-relaxed">
-                Take the first step towards financial freedom. Simple, elegant, and powerful tools at your fingertips.
+                Bước đầu tiên hướng tới tự do tài chính. Các công cụ đơn giản, thanh lịch và mạnh mẽ ngay trong tầm tay bạn.
               </p>
             </motion.div>
           </div>
@@ -79,13 +79,13 @@ export default function Register() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <h2 className="text-3xl font-black text-foreground mb-1 tracking-tight">Create Account</h2>
-              <p className="text-muted mb-10 font-medium">Join us and start tracking today.</p>
+              <h2 className="text-3xl font-black text-foreground mb-1 tracking-tight">Tạo Tài Khoản</h2>
+              <p className="text-muted mb-10 font-medium">Tham gia và bắt đầu theo dõi ngay hôm nay.</p>
               
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
                   <label className="text-xs font-black text-muted uppercase tracking-widest px-1 flex items-center gap-2">
-                    <User className="w-3.5 h-3.5" /> Full Name
+                    <User className="w-3.5 h-3.5" /> Họ và Tên
                   </label>
                   <input
                     type="text"
@@ -113,7 +113,7 @@ export default function Register() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-black text-muted uppercase tracking-widest px-1 flex items-center gap-2">
-                    <Lock className="w-3.5 h-3.5" /> Password
+                    <Lock className="w-3.5 h-3.5" /> Mật khẩu
                   </label>
                   <input
                     type="password"
@@ -135,7 +135,7 @@ export default function Register() {
                        <div className="w-6 h-6 border-2 border-primary-foreground/20 border-t-primary-foreground rounded-full animate-spin" />
                     ) : (
                       <>
-                        Sign Up Free <ArrowRight className="w-5 h-5" />
+                        Đăng Ký Miễn Phí <ArrowRight className="w-5 h-5" />
                       </>
                     )}
                   </button>
@@ -144,7 +144,7 @@ export default function Register() {
 
               <div className="mt-10 text-center">
                 <p className="text-muted font-bold text-sm">
-                  Already a member? <Link to="/login" className="text-primary hover:text-accent transition-colors ml-1">Log in</Link>
+                  Đã là thành viên? <Link to="/login" className="text-primary hover:text-accent transition-colors ml-1">Đăng nhập</Link>
                 </p>
               </div>
             </motion.div>

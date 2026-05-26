@@ -23,18 +23,18 @@
   :root {
     --background: #f8fafc;
     --foreground: #0f172a;
-    --primary: #6366f1;
+    --primary: #2563eb;
     --primary-foreground: #ffffff;
     --secondary: #f1f5f9;
     --card: #ffffff;
     --card-foreground: #0f172a;
     --muted: #64748b;
     --border: rgba(0, 0, 0, 0.08);
-    --accent: #8b5cf6;
+    --accent: #3b82f6;
     
-    --bg-mesh-1: rgba(99, 102, 241, 0.1);
-    --bg-mesh-2: rgba(139, 92, 246, 0.1);
-    --bg-mesh-3: rgba(20, 184, 166, 0.05);
+    --bg-mesh-1: rgba(37, 99, 235, 0.1);
+    --bg-mesh-2: rgba(59, 130, 246, 0.1);
+    --bg-mesh-3: rgba(14, 165, 233, 0.05);
   }
 
   /* Default to dark if user preference is dark or if .dark class is present */
@@ -42,53 +42,53 @@
     :root:not(.light) {
       --background: #0f172a;
       --foreground: #f1f5f9;
-      --primary: #818cf8;
+      --primary: #60a5fa;
       --primary-foreground: #0f172a;
       --secondary: #1e293b;
       --card: rgba(30, 41, 59, 0.7);
       --card-foreground: #f1f5f9;
       --muted: #94a3b8;
       --border: rgba(255, 255, 255, 0.1);
-      --accent: #a78bfa;
+      --accent: #93c5fd;
       
-      --bg-mesh-1: rgba(99, 102, 241, 0.2);
-      --bg-mesh-2: rgba(139, 92, 246, 0.2);
-      --bg-mesh-3: rgba(20, 184, 166, 0.1);
+      --bg-mesh-1: rgba(37, 99, 235, 0.2);
+      --bg-mesh-2: rgba(59, 130, 246, 0.2);
+      --bg-mesh-3: rgba(14, 165, 233, 0.1);
     }
   }
 
   .dark {
     --background: #0f172a;
     --foreground: #f1f5f9;
-    --primary: #818cf8;
+    --primary: #60a5fa;
     --primary-foreground: #0f172a;
     --secondary: #1e293b;
     --card: rgba(30, 41, 59, 0.7);
     --card-foreground: #f1f5f9;
     --muted: #94a3b8;
     --border: rgba(255, 255, 255, 0.1);
-    --accent: #a78bfa;
+    --accent: #93c5fd;
     
-    --bg-mesh-1: rgba(99, 102, 241, 0.2);
-    --bg-mesh-2: rgba(139, 92, 246, 0.2);
-    --bg-mesh-3: rgba(20, 184, 166, 0.1);
+    --bg-mesh-1: rgba(37, 99, 235, 0.2);
+    --bg-mesh-2: rgba(59, 130, 246, 0.2);
+    --bg-mesh-3: rgba(14, 165, 233, 0.1);
   }
 
   .light {
     --background: #f8fafc;
     --foreground: #0f172a;
-    --primary: #6366f1;
+    --primary: #2563eb;
     --primary-foreground: #ffffff;
     --secondary: #f1f5f9;
     --card: #ffffff;
     --card-foreground: #0f172a;
     --muted: #64748b;
     --border: rgba(0, 0, 0, 0.08);
-    --accent: #8b5cf6;
+    --accent: #3b82f6;
     
-    --bg-mesh-1: rgba(99, 102, 241, 0.1);
-    --bg-mesh-2: rgba(139, 92, 246, 0.1);
-    --bg-mesh-3: rgba(20, 184, 166, 0.05);
+    --bg-mesh-1: rgba(37, 99, 235, 0.1);
+    --bg-mesh-2: rgba(59, 130, 246, 0.1);
+    --bg-mesh-3: rgba(14, 165, 233, 0.05);
   }
 
   * {

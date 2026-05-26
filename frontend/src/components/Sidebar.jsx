@@ -10,10 +10,10 @@ export default function Sidebar() {
   const { theme, setTheme } = useTheme();
 
   const menuItems = [
-    { path: '/', name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { path: '/transactions', name: 'Transactions', icon: <Receipt className="w-5 h-5" /> },
-    { path: '/budgets', name: 'Budgets', icon: <PiggyBank className="w-5 h-5" /> },
-    { path: '/settings', name: 'Settings', icon: <Settings className="w-5 h-5" /> },
+    { path: '/', name: 'Tổng quan', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { path: '/transactions', name: 'Giao dịch', icon: <Receipt className="w-5 h-5" /> },
+    { path: '/budgets', name: 'Ngân sách', icon: <PiggyBank className="w-5 h-5" /> },
+    { path: '/settings', name: 'Cài đặt', icon: <Settings className="w-5 h-5" /> },
   ];
 
   const themeIcons = {
@@ -97,7 +97,7 @@ export default function Sidebar() {
           </div>
           <div className="overflow-hidden">
             <p className="text-foreground font-bold text-sm truncate leading-tight">{user?.name || 'Guest User'}</p>
-            <p className="text-muted text-[10px] uppercase tracking-wider font-semibold truncate leading-tight">{user?.role || 'Premium account'}</p>
+            <p className="text-muted text-[10px] uppercase tracking-wider font-semibold truncate leading-tight">{user?.role || 'Tài khoản'}</p>
           </div>
         </div>
 
@@ -107,7 +107,7 @@ export default function Sidebar() {
         >
           <div className="flex items-center gap-3">
             <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
-            <span className="font-bold text-[11px] uppercase tracking-widest">Sign Out</span>
+            <span className="font-bold text-[11px] uppercase tracking-widest">Đăng xuất</span>
           </div>
           <ChevronRight className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity" />
         </button>

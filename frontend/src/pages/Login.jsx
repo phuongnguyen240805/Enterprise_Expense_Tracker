@@ -18,7 +18,7 @@ export default function Login() {
       await login({ email, password });
       navigate('/');
     } catch (err) {
-      alert('Login failed: ' + (err.response?.data?.message || 'Check credentials'));
+      alert('Đăng nhập thất bại: ' + (err.response?.data?.message || 'Kiểm tra thông tin đăng nhập'));
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ export default function Login() {
             <div className="p-2 rounded-lg bg-primary-foreground/10 group-hover:bg-primary-foreground/20 transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </div>
-            <span className="font-semibold tracking-wide">BACK TO HOME</span>
+            <span className="font-semibold tracking-wide">VỀ TRANG CHỦ</span>
           </Link>
           
           <div className="relative z-10 w-full">
@@ -52,11 +52,11 @@ export default function Login() {
               transition={{ delay: 0.3, duration: 0.8 }}
             >
               <h1 className="text-6xl font-black mb-6 text-primary-foreground leading-tight tracking-tighter">
-                Master Your<br/>
-                <span className="text-white/80">Fortunes.</span>
+                Kiểm Soát<br/>
+                <span className="text-white/80">Tài Chính.</span>
               </h1>
               <p className="text-lg text-primary-foreground/70 mb-10 max-w-xs font-medium leading-relaxed">
-                Join thousands of users who take control of their financial destiny with precision and style.
+                Tham gia cùng hàng ngàn người dùng kiểm soát tài chính của họ với sự chính xác và phong cách.
               </p>
             </motion.div>
           </div>
@@ -80,8 +80,8 @@ export default function Login() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-3xl font-black text-foreground mb-1 tracking-tight">Welcome Back</h2>
-              <p className="text-muted mb-10 font-medium">Please enter your details to sign in.</p>
+              <h2 className="text-3xl font-black text-foreground mb-1 tracking-tight">Chào mừng trở lại</h2>
+              <p className="text-muted mb-10 font-medium">Vui lòng nhập thông tin để đăng nhập.</p>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
@@ -101,9 +101,9 @@ export default function Login() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center px-1">
                     <label className="text-xs font-black text-muted uppercase tracking-widest flex items-center gap-2">
-                      <Lock className="w-3.5 h-3.5" /> Password
+                      <Lock className="w-3.5 h-3.5" /> Mật khẩu
                     </label>
-                    <a href="#" className="text-[10px] text-primary font-black hover:text-accent transition-colors uppercase tracking-widest">Forgot?</a>
+                    <a href="#" className="text-[10px] text-primary font-black hover:text-accent transition-colors uppercase tracking-widest">Quên mật khẩu?</a>
                   </div>
                   <input
                     type="password"
@@ -124,7 +124,7 @@ export default function Login() {
                      <div className="w-6 h-6 border-2 border-primary-foreground/20 border-t-primary-foreground rounded-full animate-spin" />
                   ) : (
                     <>
-                      Sign In <ArrowRight className="w-5 h-5" />
+                      Đăng Nhập <ArrowRight className="w-5 h-5" />
                     </>
                   )}
                 </button>
@@ -132,7 +132,7 @@ export default function Login() {
 
               <div className="mt-10 text-center">
                 <p className="text-muted font-bold text-sm">
-                  New here? <Link to="/register" className="text-primary hover:text-accent transition-colors ml-1">Create an account</Link>
+                  Chưa có tài khoản? <Link to="/register" className="text-primary hover:text-accent transition-colors ml-1">Tạo tài khoản mới</Link>
                 </p>
               </div>
             </motion.div>
